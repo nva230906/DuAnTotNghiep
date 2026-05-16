@@ -18,6 +18,26 @@ const router = createRouter({
       component: () => import('../components/FormNhanVienComponents.vue'),
     },
     {
+      path: '/khach-hang',
+      name: 'Khách Hàng',
+      component: () => import('../views/KhachHangView.vue'),
+    },
+    {
+      path: '/khach-hang/edit/:id',
+      name: 'editKhachHang',
+      component: () => import('../components/FormKhachHangComponents.vue')
+    },
+    {
+      path: '/khach-hang/add',
+      name: 'addKhachHang',
+      component: () => import('../components/FormKhachHangComponents.vue'),
+    },
+    {
+      path: '/ca-lam-viec',
+      name: 'Ca Làm  Viêc',
+      component: () => import('../views/CaLamViecView.vue'),
+    },
+    {
       path: '/:pathMatch(.*)*',
       redirect: '/'
     },

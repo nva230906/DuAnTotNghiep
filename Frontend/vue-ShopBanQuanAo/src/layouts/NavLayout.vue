@@ -6,10 +6,13 @@
 
     <ul class="nav flex-column">
       <li class="nav-item">
-        <router-link class="nav-link" to="/add">Khách Hàng</router-link>
+        <router-link class="nav-link" to="/khach-hang">Khách Hàng</router-link>
       </li>
       <li class="nav-item">
         <router-link class="nav-link" to="/nhan-vien">Nhân Viên</router-link>
+      </li>
+      <li class="nav-item">
+        <router-link class="nav-link" to="/ca-lam-viec">Ca Làm việc</router-link>
       </li>
     </ul>
   </nav>

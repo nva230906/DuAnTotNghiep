@@ -11,7 +11,6 @@
         />
         <button @click="searchNhanVien" class="btn-search-submit">Tìm kiếm</button>
       </div>
-
       <div class="action-group">
         <button @click="resetSearch" class="btn-reset" title="Làm mới dữ liệu">
           <i class="fas fa-sync-alt"></i> Làm mới
@@ -37,7 +36,7 @@
             <tr>
               <th>#</th>
               <th>Ảnh</th>
-              <th>Mã NV</th>
+              <!-- <th>Mã NV</th> -->
               <th>Tên nhân viên</th>
               <th>Vai trò</th>
               <th>Địa chỉ</th>
@@ -51,15 +50,15 @@
             <tr v-for="(item, index) in listNhanVien" :key="item.id">
               <td>{{ pageNo * pageSize + index + 1 }}</td>
               <td>
-                <div class="avatar-wrapper">
+                <div class="avatar-wrapper" v-if="item.anh">
                   <img
-                    :src="item.anh || 'https://via.placeholder.com/40'"
-                    alt="Avatar"
+                    :src="`http://localhost:8080/api/shop-ban-quan-ao/nhan-vien/uploads/${item.anh}`"
                     class="avatar-img"
                   />
                 </div>
+                <span v-else class="no-avatar">Chưa có ảnh</span>
               </td>
-              <td class="font-bold text-nowrap">{{ item.maNhanVien }}</td>
+              <!-- <td class="font-bold text-nowrap">{{ item.maNhanVien }}</td> -->
               <td class="font-medium text-nowrap">{{ item.tenNhanVien }}</td>
               <td class="text-nowrap">
                 <span class="role-badge">{{ item.tenVaiTro }}</span>
@@ -134,11 +133,10 @@ import {
   phanTrangNhanVienService,
   searchNhanVienService,
 } from '@/service/NhanVienService'
-import { onMounted, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useToast } from 'vue-toastification'
 import Swal from 'sweetalert2'
 import router from '@/router'
-
 // Phân trang
 const pageNo = ref(0)
 const pageSize = ref(5)
@@ -517,5 +515,103 @@ td {
 .page-indicator span {
   font-weight: 700;
   color: #2563eb;
+}
+/* --- Cập nhật phần ảnh to hơn --- */
+
+/* Căn giữa nội dung trong ô chứa Ảnh (ô thứ 2) */
+td:nth-child(2) {
+  text-align: center;
+  vertical-align: middle;
+  padding-left: 10px; /* Giảm padding một chút để dành không gian cho ảnh to */
+  padding-right: 10px;
+}
+
+/* Khung bao quanh ảnh - Tăng kích thước */
+.avatar-wrapper {
+  width: 80px; /* Đã tăng lên 80px, bạn có thể chỉnh thành 100px nếu muốn to hơn nữa */
+  height: 80px; /* Phải bằng width để tạo hình tròn */
+  border-radius: 50%;
+  overflow: hidden;
+  border: 3px solid #e2e8f0; /* Tăng độ dày viền một chút cho cân đối */
+  display: inline-block;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15); /* Thêm đổ bóng rõ hơn */
+  transition: transform 0.2s ease-in-out; /* Thêm hiệu ứng rẽ nhẹ khi hover */
+}
+
+/* Hiệu ứng khi di chuột vào ảnh */
+.avatar-wrapper:hover {
+  transform: scale(1.05); /* Phóng to nhẹ một chút */
+  border-color: #2563eb; /* Đổi màu viền sang màu chủ đạo */
+}
+
+/* Ảnh bên trong - Giữ nguyên object-fit để không bị méo */
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Style cho dòng "Chưa có ảnh" */
+.no-avatar {
+  font-size: 0.8rem;
+  color: #94a3b8;
+  font-style: italic;
+  display: inline-block;
+  width: 80px; /* Bằng chiều rộng ảnh để căn chỉnh đều */
+  text-align: center;
+}
+/* Đảm bảo nội dung bên trong ô TD luôn nằm ngang */
+td.text-nowrap {
+  white-space: nowrap !important;
+}
+
+/* Tinh chỉnh Tag Giới tính */
+.gender-tag {
+  display: inline-flex; /* Chuyển sang flex để kiểm soát nội dung bên trong */
+  align-items: center;
+  justify-content: center;
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-width: 60px; /* Đảm bảo độ dài đồng nhất */
+  white-space: nowrap; /* Ép không xuống dòng */
+}
+
+/* Tinh chỉnh Badge Trạng thái */
+.status-badge {
+  display: inline-flex; /* Chuyển sang flex */
+  align-items: center;
+  justify-content: center;
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-width: 90px; /* Đang làm/Nghỉ việc có độ dài khác nhau nên đặt min-width */
+  white-space: nowrap; /* Ép không xuống dòng */
+}
+th {
+  background: #f8fafc;
+  padding: 14px 20px;
+  text-align: left;
+  font-size: 0.75rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  /* Thêm dòng này để tiêu đề "GIỚI TÍNH" nằm ngang */
+  white-space: nowrap;
+}
+/* Ép cột thứ 7 (Giới tính) và thứ 8 (Trạng thái) rộng ra một chút */
+td:nth-child(7),
+th:nth-child(7) {
+  min-width: 100px; /* Đảm bảo đủ chỗ cho chữ "GIỚI TÍNH" */
+  text-align: center; /* Căn giữa cho đẹp vì tag thường ngắn */
+}
+
+td:nth-child(8),
+th:nth-child(8) {
+  min-width: 120px; /* Cho cột Trạng thái */
+  text-align: center;
 }
 </style>
