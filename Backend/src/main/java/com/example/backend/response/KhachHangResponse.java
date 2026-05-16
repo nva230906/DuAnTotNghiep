@@ -10,19 +10,19 @@ import java.util.Date;
 @Data
 public class KhachHangResponse {
     private Integer id;
-    private Integer idTaiKhoan;
-    private String email;
     private String maKhachHang;
     private String hoTen;
+    private Integer idTaiKhoan;
+    private String email;
+    private String tenTaiKhoan;
     private String soDienThoai;
     private Date ngaySinh;
-    private String hangThanhVien;
-    private Integer soLanMua;
-    private Instant ngayMuaCuoi;
     private String anh;
-    private Instant ngayTao;
-    private Instant ngayCapNhat;
-    private String nguoiTao;
-    private String nguoiCapNhat;
+    private String thanhPho;
+    private String quan;
+    private String phuong;
+    private String diaChiCuThe;
+    private String diaChi;
+    private Boolean gioTinh;
     private Integer trangThai;
 }

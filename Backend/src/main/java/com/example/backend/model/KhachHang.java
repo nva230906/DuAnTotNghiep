@@ -75,4 +75,12 @@ public class KhachHang {
     @Column(name = "anh")
     private String anh;
 
+    @Column(name = "gioi_tinh")
+    private Boolean gioiTinh;
+
+    @Size(max = 255)
+    @Nationalized
+    @Column(name = "dia_chi")
+    private String diaChi;
+
 }

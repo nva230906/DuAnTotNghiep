@@ -109,29 +109,57 @@ public class NhanVienImpl implements NhanVienService {
     }
 
     @Override
+    @Transactional // Quan trọng: Đảm bảo nếu lưu lỗi thì sẽ rollback dữ liệu
     public void updateNhanVien(Integer id, NhanVienRequest nhanVienRequest, MultipartFile file) {
-        NhanVien nhanVien = nhanVienRepository.findById(id).get();
-        BeanUtils.copyProperties(nhanVienRequest, nhanVien);
-        TaiKhoan taiKhoan = taiKhoanRepository.findById(id).get();
+        // 1. Tìm nhân viên, nếu không thấy thì báo lỗi rõ ràng
+        NhanVien nhanVien = nhanVienRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy nhân viên với ID: " + id));
+
+        // 2. Lấy tài khoản liên kết từ nhân viên
+        TaiKhoan taiKhoan = nhanVien.getIdTaiKhoan();
+        if (taiKhoan == null) {
+            throw new RuntimeException("Nhân viên này chưa có tài khoản!");
+        }
+
+        // 3. Cập nhật thông tin Tài Khoản trước
         taiKhoan.setEmail(nhanVienRequest.getEmail());
         taiKhoan.setSoDienThoai(nhanVienRequest.getSoDienThoai());
+
+        // Chỉ cập nhật mật khẩu nếu người dùng có nhập mới
         if (nhanVienRequest.getMatKhau() != null && !nhanVienRequest.getMatKhau().isBlank()) {
             taiKhoan.setMatKhau(nhanVienRequest.getMatKhau());
         }
+
+        // Cập nhật vai trò
         if (nhanVienRequest.getIdVaiTro() != null) {
             VaiTro vt = vaiTroRepository.findById(nhanVienRequest.getIdVaiTro())
-                    .orElseThrow();
+                    .orElseThrow(() -> new RuntimeException("Vai trò không tồn tại"));
             taiKhoan.setIdVaiTro(vt);
         }
         taiKhoanRepository.save(taiKhoan);
+
+        // 4. Cập nhật thông tin Nhân Viên
+        // Tránh dùng copyProperties trực tiếp lên ID để an toàn
+        nhanVien.setTenNhanVien(nhanVienRequest.getTenNhanVien());
+        nhanVien.setGioiTinh(nhanVienRequest.getGioiTinh());
+        nhanVien.setNgaySinh(nhanVienRequest.getNgaySinh());
+        nhanVien.setCanCuocCongDan(nhanVienRequest.getCanCuocCongDan());
+        nhanVien.setDiaChi(nhanVienRequest.getDiaChi());
+        nhanVien.setTrangThai(nhanVienRequest.getTrangThai());
+
+        // 5. Xử lý file ảnh
         if (file != null && !file.isEmpty()) {
-            String fileName = saveFive(file);
-            nhanVien.setAnh(fileName);
+            try {
+                String fileName = saveFive(file); // Đảm bảo hàm này trả về tên file hợp lệ
+                nhanVien.setAnh(fileName);
+            } catch (Exception e) {
+                throw new RuntimeException("Lỗi khi lưu file ảnh");
+            }
         }
-        nhanVien.setIdTaiKhoan(taiKhoan);
+
+        // Lưu nhân viên (taiKhoan đã được cập nhật ở bước 3)
         nhanVienRepository.save(nhanVien);
     }
-
     @Override
     public List<NhanVienResponse> searchFullNhanVien(String keyword) {
         return nhanVienRepository.search(keyword);

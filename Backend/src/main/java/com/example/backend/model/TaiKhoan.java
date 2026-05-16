@@ -1,6 +1,7 @@
 package com.example.backend.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.ColumnDefault;
@@ -51,5 +52,9 @@ public class TaiKhoan {
 
     @Column(name = "trang_thai")
     private Integer trangThai;
+
+    @Size(max = 100)
+    @Column(name = "ten_tai_khoan", length = 100)
+    private String tenTaiKhoan;
 
 }
